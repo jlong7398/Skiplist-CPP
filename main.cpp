@@ -1,43 +1,42 @@
-/* ************************************************************************
-> File Name:     main.cpp
-> Author:        程序员Carl
-> 微信公众号:    代码随想录
-> Created Time:  Sun Dec  2 20:21:41 2018
-> Description:   
- ************************************************************************/
 #include <iostream>
-#include "skiplist.h"
+#include <string>
+
+#include "KVStore.h"
+
 #define FILE_PATH "./store/dumpFile"
 
 int main() {
+  // 使用 KVStore 而不是直接使用 SkipList
+  KVStore<int, std::string> kvStore(FILE_PATH);
 
-    // 键值中的key用int型，如果用其他类型，需要自定义比较函数
-    // 而且如果修改key的类型，同时需要修改skipList.load_file函数
-    SkipList<int, std::string> skipList(6);
-	skipList.insert_element(1, "学"); 
-	skipList.insert_element(3, "算法"); 
-	skipList.insert_element(7, "认准"); 
-	skipList.insert_element(8, "微信公众号：代码随想录"); 
-	skipList.insert_element(9, "学习"); 
-	skipList.insert_element(19, "算法不迷路"); 
-	skipList.insert_element(19, "赶快关注吧你会发现详见很晚！"); 
+  // 插入一些数据
+  kvStore.put(1, "good");
+  kvStore.put(3, "good");
+  kvStore.put(7, "study");
+  kvStore.put(8, ",");
+  kvStore.put(9, "day");
+  kvStore.put(19, "day");
+  kvStore.put(29, "up");
 
-    std::cout << "skipList size:" << skipList.size() << std::endl;
+  std::string value;
+  if (kvStore.get(9, value)) {
+    std::cout << "Found key 9: " << value << std::endl;
+  } else {
+    std::cout << "Key 9 not found." << std::endl;
+  }
 
-    skipList.dump_file();
+  // 持久化会在析构函数中自动调用
+  // 也可以手动调用 kvStore.dump(); 但它是 public 接口吗？是的
 
-    // skipList.load_file();
+  kvStore.del(3);
+  kvStore.del(7);
 
-    skipList.search_element(9);
-    skipList.search_element(18);
+  if (kvStore.get(3, value)) {
+    std::cout << "Found key 3: " << value << std::endl;
+  } else {
+    std::cout << "Key 3 deleted as expected." << std::endl;
+  }
 
-
-    skipList.display_list();
-
-    skipList.delete_element(3);
-    skipList.delete_element(7);
-
-    std::cout << "skipList size:" << skipList.size() << std::endl;
-
-    skipList.display_list();
+  std::cout << "KVStore operations finished." << std::endl;
+  return 0;
 }
